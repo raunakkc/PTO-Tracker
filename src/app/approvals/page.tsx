@@ -2,14 +2,15 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { TIME_OFF_REASONS, TimeOffReasonKey } from '@/lib/constants';
 import { TimeOffRequestData } from '@/types';
 
-export default function ApprovalsPage() {
+function ApprovalsContent() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -298,5 +299,13 @@ export default function ApprovalsPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function ApprovalsPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading approvals...</div>}>
+            <ApprovalsContent />
+        </Suspense>
     );
 }
