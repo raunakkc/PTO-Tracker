@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String           @id @default(cuid())
+  name              String
+  email             String           @unique
+  password          String
+  role              String           @default("USER")
+  team              String?
+  workRemoteBalance Int              @default(12)
+  avatarColor       String           @default("#6366f1")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  requests          TimeOffRequest[] @relation("requester")
+  approvals         TimeOffRequest[] @relation("approver")
+  notifications     Notification[]
+}
+
+model TimeOffRequest {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation("requester", fields: [userId], references: [id], onDelete: Cascade)
+  reason       String
+  startDate    DateTime
+  endDate      DateTime
+  notes        String
+  status       String   @default("PENDING")
+  approvedById String?
+  approver     User?    @relation("approver", fields: [approvedById], references: [id])
+  approvalNote String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
