@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendTeamsNotification } from '@/lib/teams';
 
 // Utility: check if a date falls on a weekend (Saturday=6, Sunday=0)
 function isWeekend(date: Date): boolean {
@@ -254,7 +255,7 @@ export async function POST(request: Request) {
             },
         });
 
-        // Notify all managers
+        // Notify all managers via In-App Notification
         const managers = await prisma.user.findMany({
             where: { role: 'MANAGER' },
         });
@@ -267,6 +268,20 @@ export async function POST(request: Request) {
                 link: '/approvals',
             })),
         });
+
+        // Notify via MS Teams (Async - don't await strictly to avoid blocking response if webhook is slow)
+        const teamsPayload = {
+            title: 'New Time-Off Request',
+            message: `**${user.name}** has requested leave.`,
+            user: user.name,
+            startDate: start.toLocaleDateString(),
+            endDate: end.toLocaleDateString(),
+            reason: reason.replace(/_/g, ' ').toLowerCase(),
+            link: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/approvals?highlight=${newRequest.id}`,
+        };
+
+        // We catch errors so the user request still succeeds even if Teams fails
+        sendTeamsNotification(teamsPayload).catch(err => console.error('Teams notification background error:', err));
 
         return NextResponse.json(newRequest);
     } catch (error) {
