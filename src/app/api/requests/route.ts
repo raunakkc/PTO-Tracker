@@ -280,8 +280,16 @@ export async function POST(request: Request) {
             link: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/approvals?highlight=${newRequest.id}`,
         };
 
-        // We catch errors so the user request still succeeds even if Teams fails
-        sendTeamsNotification(teamsPayload).catch(err => console.error('Teams notification background error:', err));
+
+        // Notify via MS Teams
+        // We MUST await this in Vercel/Serverless, otherwise the function freezes 
+        // immediately after return and the request is never sent.
+        try {
+            await sendTeamsNotification(teamsPayload);
+        } catch (err) {
+            console.error('Teams notification error:', err);
+            // We swallow the error so the user request still succeeds
+        }
 
         return NextResponse.json(newRequest);
     } catch (error) {
