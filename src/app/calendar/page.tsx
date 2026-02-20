@@ -96,15 +96,15 @@ export default function CalendarPage() {
     if (!session) return null;
 
     return (
-        <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200">
+        <div className="app-layout">
             <Sidebar />
-            <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <main className="main-content">
                 <Header title="Team Calendar" />
-                <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+                <div className="page-content">
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={handleDownloadPDF}
-                            className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors flex items-center gap-2"
+                            className="btn btn-secondary flex items-center gap-2"
                         >
                             <span>Download PDF</span>
                         </button>
