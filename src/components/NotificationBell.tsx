@@ -61,7 +61,7 @@ export default function NotificationBell() {
     }
 
     return (
-        <div ref={dropdownRef} style={{ position: 'relative' }}>
+        <div ref={dropdownRef} className="relative flex items-center">
             <button
                 className="notification-btn"
                 onClick={() => setIsOpen(!isOpen)}

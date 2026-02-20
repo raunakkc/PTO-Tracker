@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import NotificationBell from './NotificationBell';
 import { useTheme } from './ThemeProvider';
-import { ArrowDownTrayIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, XMarkIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 
 interface HeaderProps {
     title: string;
@@ -30,39 +30,46 @@ export default function Header({ title }: HeaderProps) {
     return (
         <>
             <header
-                className="fixed top-0 z-30 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-200"
+                className="fixed top-0 z-30 flex items-center h-16 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-200"
                 style={{ left: 'var(--sidebar-width)', right: 0 }}
             >
-                <div className="px-3 py-3 lg:px-5 lg:pl-3">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center justify-start rtl:justify-end">
-                            <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-                                {title}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-3">
+                <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+                    {/* Left: Title */}
+                    <div className="flex-shrink-0">
+                        <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                            {title}
+                        </h1>
+                    </div>
 
-                            {/* Theme Toggle */}
-                            <button
-                                className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                onClick={toggleTheme}
-                                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                            >
-                                {theme === 'dark' ? '☀️' : '🌙'}
-                            </button>
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-4">
 
-                            {/* Export Button (Manager Only) */}
-                            {isManager && (
-                                <button
-                                    onClick={() => setShowExportModal(true)}
-                                    className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                                    title="Export Data"
-                                >
-                                    <ArrowDownTrayIcon className="w-6 h-6" />
-                                </button>
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            {theme === 'dark' ? (
+                                <SunIcon className="w-6 h-6" />
+                            ) : (
+                                <MoonIcon className="w-6 h-6" />
                             )}
+                        </button>
 
-                            {/* Notifications */}
+                        {/* Export Button (Manager Only) */}
+                        {isManager && (
+                            <button
+                                onClick={() => setShowExportModal(true)}
+                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                title="Export Data to Excel"
+                            >
+                                <ArrowDownTrayIcon className="w-6 h-6" />
+                            </button>
+                        )}
+
+                        {/* Notifications */}
+                        <div className="flex items-center">
                             <NotificationBell />
                         </div>
                     </div>
