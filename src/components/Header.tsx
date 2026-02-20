@@ -108,47 +108,46 @@ export default function Header({ title, handleDownloadPDF }: HeaderProps) {
             {/* Export Modal */}
             {
                 showExcelModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-6 animate-in fade-in zoom-in duration-200">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Export Report</h3>
-                                <button onClick={() => setShowExcelModal(false)} className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors">
-                                    <XMarkIcon className="h-6 w-6" />
+                    <div className="modal-overlay">
+                        <div className="modal">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Export Report</h2>
+                                <button onClick={() => setShowExcelModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+                                    <XMarkIcon className="h-6 w-6" style={{ width: '24px', height: '24px' }} />
                                 </button>
                             </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
-                                    <input
-                                        type="date"
-                                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={exportStart}
-                                        onChange={(e) => setExportStart(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
-                                    <input
-                                        type="date"
-                                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={exportEnd}
-                                        onChange={(e) => setExportEnd(e.target.value)}
-                                    />
-                                </div>
+                            <div className="form-group">
+                                <label className="form-label">Start Date</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={exportStart}
+                                    onChange={(e) => setExportStart(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">End Date</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={exportEnd}
+                                    onChange={(e) => setExportEnd(e.target.value)}
+                                />
                             </div>
 
-                            <div className="mt-8 flex justify-end gap-3">
+                            <div className="modal-actions">
                                 <button
                                     onClick={() => setShowExcelModal(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                                    className="btn btn-secondary"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleExport}
                                     disabled={!exportStart || !exportEnd}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm shadow-indigo-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="btn btn-primary"
+                                    style={{ opacity: (!exportStart || !exportEnd) ? 0.5 : 1, cursor: (!exportStart || !exportEnd) ? 'not-allowed' : 'pointer' }}
                                 >
                                     Download Excel
                                 </button>
