@@ -34,11 +34,21 @@ export default function Header({ title }: HeaderProps) {
                 style={{ left: 'var(--sidebar-width)', right: 0 }}
             >
                 <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                    {/* Left: Title */}
-                    <div className="flex-shrink-0">
+                    {/* Left: Title & Export */}
+                    <div className="flex items-center gap-4 flex-shrink-0">
                         <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                             {title}
                         </h1>
+                        {/* Export Button (Manager Only) */}
+                        {isManager && (
+                            <button
+                                onClick={() => setShowExportModal(true)}
+                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                title="Export Data to Excel"
+                            >
+                                <ArrowDownTrayIcon className="w-6 h-6" />
+                            </button>
+                        )}
                     </div>
 
                     {/* Right: Actions */}
@@ -56,17 +66,6 @@ export default function Header({ title }: HeaderProps) {
                                 <MoonIcon className="w-6 h-6" />
                             )}
                         </button>
-
-                        {/* Export Button (Manager Only) */}
-                        {isManager && (
-                            <button
-                                onClick={() => setShowExportModal(true)}
-                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                                title="Export Data to Excel"
-                            >
-                                <ArrowDownTrayIcon className="w-6 h-6" />
-                            </button>
-                        )}
 
                         {/* Notifications */}
                         <div className="flex items-center">
