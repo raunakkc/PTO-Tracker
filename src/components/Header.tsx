@@ -29,7 +29,10 @@ export default function Header({ title }: HeaderProps) {
 
     return (
         <>
-            <header className="fixed top-0 z-30 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+            <header
+                className="fixed top-0 z-30 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-200"
+                style={{ left: 'var(--sidebar-width)', right: 0 }}
+            >
                 <div className="px-3 py-3 lg:px-5 lg:pl-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center justify-start rtl:justify-end">
