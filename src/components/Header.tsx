@@ -8,21 +8,23 @@ import { ArrowDownTrayIcon, XMarkIcon, MoonIcon, SunIcon } from '@heroicons/reac
 
 interface HeaderProps {
     title: string;
+    handleDownloadPDF?: () => Promise<void>;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({ title, handleDownloadPDF }: HeaderProps) {
     const { theme, toggleTheme } = useTheme();
     const { data: session } = useSession();
 
     // Export Modal State
     const [showExportModal, setShowExportModal] = useState(false);
+    const [showExcelModal, setShowExcelModal] = useState(false);
     const [exportStart, setExportStart] = useState('');
     const [exportEnd, setExportEnd] = useState('');
 
     const handleExport = () => {
         if (!exportStart || !exportEnd) return;
         window.location.href = `/api/export/excel?startDate=${exportStart}&endDate=${exportEnd}`;
-        setShowExportModal(false);
+        setShowExcelModal(false);
     };
 
     const isManager = (session?.user as any)?.role === 'MANAGER';
@@ -34,25 +36,56 @@ export default function Header({ title }: HeaderProps) {
                 style={{ left: 'var(--sidebar-width)', right: 0 }}
             >
                 <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                    {/* Left: Title & Export */}
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                        <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                    {/* Left: Title */}
+                    <div className="flex-shrink-0">
+                        <h1 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl ml-4 sm:ml-0">
                             {title}
                         </h1>
-                        {/* Export Button (Manager Only) */}
-                        {isManager && (
-                            <button
-                                onClick={() => setShowExportModal(true)}
-                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-                                title="Export Data to Excel"
-                            >
-                                <ArrowDownTrayIcon className="w-6 h-6" />
-                            </button>
-                        )}
                     </div>
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-4">
+
+                        {/* Export Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowExportModal(!showExportModal)}
+                                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                                title="Export Data"
+                            >
+                                <ArrowDownTrayIcon className="w-6 h-6" />
+                            </button>
+
+                            {/* Export Menu */}
+                            {showExportModal && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1 z-50 animate-in fade-in slide-in-from-top-2">
+                                    <button
+                                        onClick={async () => {
+                                            setShowExportModal(false);
+                                            // Trigger PDF Download
+                                            if (handleDownloadPDF) {
+                                                await handleDownloadPDF();
+                                            }
+                                        }}
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        Download PDF
+                                    </button>
+
+                                    {isManager && (
+                                        <button
+                                            onClick={() => {
+                                                setShowExportModal(false);
+                                                setShowExcelModal(true);
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            Export to Excel
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
 
                         {/* Theme Toggle */}
                         <button
@@ -76,12 +109,12 @@ export default function Header({ title }: HeaderProps) {
             </header>
 
             {/* Export Modal */}
-            {showExportModal && (
+            {showExcelModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                     <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-6 animate-in fade-in zoom-in duration-200">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Export Report</h3>
-                            <button onClick={() => setShowExportModal(false)} className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors">
+                            <button onClick={() => setShowExcelModal(false)} className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors">
                                 <XMarkIcon className="h-6 w-6" />
                             </button>
                         </div>
@@ -109,7 +142,7 @@ export default function Header({ title }: HeaderProps) {
 
                         <div className="mt-8 flex justify-end gap-3">
                             <button
-                                onClick={() => setShowExportModal(false)}
+                                onClick={() => setShowExcelModal(false)}
                                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                             >
                                 Cancel

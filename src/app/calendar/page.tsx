@@ -99,17 +99,9 @@ export default function CalendarPage() {
         <div className="app-layout">
             <Sidebar />
             <main className="main-content">
-                <Header title="Team Calendar" />
+                <Header title="Team Calendar" handleDownloadPDF={handleDownloadPDF} />
                 <div className="page-content">
-                    <div className="flex justify-end mb-4">
-                        <button
-                            onClick={handleDownloadPDF}
-                            className="btn btn-secondary flex items-center gap-2"
-                        >
-                            <span>Download PDF</span>
-                        </button>
-                    </div>
-                    <div id="calendar-container" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                    <div id="calendar-container" className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mt-2">
                         <Calendar
                             requests={requests}
                             users={users}
