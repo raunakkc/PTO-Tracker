@@ -7,14 +7,14 @@ export const TIME_OFF_REASONS = {
         textColor: '#166534',
     },
     FIRST_HALF_WORK_REMOTE: {
-        label: '1st Half WFH',
+        label: 'First Half WFH',
         type: 'HALF_DAY',
         color: '#10b981',
         lightColor: '#d1fae5',
         textColor: '#065f46',
     },
     SECOND_HALF_WORK_REMOTE: {
-        label: '2nd Half WFH',
+        label: 'Second Half WFH',
         type: 'HALF_DAY',
         color: '#34d399',
         lightColor: '#a7f3d0',

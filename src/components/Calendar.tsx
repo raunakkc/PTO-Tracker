@@ -177,7 +177,7 @@ export default function Calendar({ requests, users, isManager, onRequestUpdate }
         setActionLoading(false);
     }
 
-    const gridCols = `240px repeat(${days.length}, 1fr)`;
+    const gridCols = `240px repeat(${days.length}, minmax(0, 1fr))`;
 
     return (
         <div>
