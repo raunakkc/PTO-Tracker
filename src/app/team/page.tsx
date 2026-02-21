@@ -202,7 +202,7 @@ export default function TeamPage() {
                                 </div>
                             </div>
 
-                            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                            <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
                                 <table className="team-table">
                                     <thead>
                                         <tr>
@@ -310,7 +310,7 @@ export default function TeamPage() {
                                 </div>
                             </div>
 
-                            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                            <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
                                 {balanceLoading ? (
                                     <div className="loading-spinner" style={{ padding: '40px' }}>
                                         <div className="spinner"></div>

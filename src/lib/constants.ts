@@ -7,14 +7,14 @@ export const TIME_OFF_REASONS = {
         textColor: '#166534',
     },
     FIRST_HALF_WORK_REMOTE: {
-        label: 'First Half WFH',
+        label: 'First half WFH',
         type: 'HALF_DAY',
         color: '#10b981',
         lightColor: '#d1fae5',
         textColor: '#065f46',
     },
     SECOND_HALF_WORK_REMOTE: {
-        label: 'Second Half WFH',
+        label: 'Second half WFH',
         type: 'HALF_DAY',
         color: '#34d399',
         lightColor: '#a7f3d0',
@@ -28,14 +28,14 @@ export const TIME_OFF_REASONS = {
         textColor: '#9d174d',
     },
     FIRST_HALF_PTO: {
-        label: 'First Half PTO',
+        label: 'First half PTO',
         type: 'HALF_DAY',
         color: '#eab308',
         lightColor: '#fef9c3',
         textColor: '#854d0e',
     },
     SECOND_HALF_PTO: {
-        label: 'Second Half PTO',
+        label: 'Second half PTO',
         type: 'HALF_DAY',
         color: '#f97316',
         lightColor: '#ffedd5',

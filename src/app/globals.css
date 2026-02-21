@@ -684,13 +684,14 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .calendar-header-row {
   display: grid;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
+  min-width: 800px;
 }
 
 .calendar-header-cell {
@@ -734,6 +735,7 @@ body {
   border-bottom: 1px solid var(--border-light);
   min-height: 60px;
   transition: background 0.15s ease;
+  min-width: 800px;
 }
 
 .calendar-row:hover {
@@ -750,6 +752,7 @@ body {
   align-items: center;
   gap: 10px;
   border-right: 1px solid var(--border-light);
+  min-width: 0;
 }
 
 .calendar-user-cell .avatar {
@@ -782,6 +785,7 @@ body {
   flex-direction: column;
   gap: 2px;
   min-height: 64px;
+  min-width: 0;
 }
 
 .calendar-day-cell.today {
