@@ -1550,11 +1550,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #f1f5f9;
+    color: #f1f5f9 !important;
+  }
+
+  .mobile-menu-btn svg,
+  .header-actions .notification-btn svg {
+    stroke: #f1f5f9 !important;
   }
 
   .header-actions .notification-btn {
-    color: #f1f5f9;
+    color: #f1f5f9 !important;
   }
 
   .sidebar {
