@@ -1539,16 +1539,22 @@ body {
   transition: opacity 0.3s ease;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent);
+    color: #f1f5f9;
   }
 
   .header-actions .notification-btn {
-    color: var(--accent);
+    color: #f1f5f9;
   }
 
   .sidebar {

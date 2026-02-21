@@ -177,7 +177,7 @@ export default function Calendar({ requests, users, isManager, onRequestUpdate }
         setActionLoading(false);
     }
 
-    const gridCols = `240px repeat(${days.length}, minmax(0, 1fr))`;
+    const gridCols = `240px repeat(${days.length}, minmax(40px, 1fr))`;
 
     return (
         <div>
@@ -214,247 +214,249 @@ export default function Calendar({ requests, users, isManager, onRequestUpdate }
                 </div>
             </div>
 
-            <div className="calendar-grid">
-                {/* Header Row */}
-                <div className="calendar-header-row" style={{ gridTemplateColumns: gridCols }}>
-                    <div className="calendar-header-cell name-col">Team Member</div>
-                    {days.map((day) => {
-                        const isLow = lowAttendanceDays.has(day.toISOString());
+            <div className="table-responsive">
+                <div className="calendar-grid">
+                    {/* Header Row */}
+                    <div className="calendar-header-row" style={{ gridTemplateColumns: gridCols }}>
+                        <div className="calendar-header-cell name-col">Team Member</div>
+                        {days.map((day) => {
+                            const isLow = lowAttendanceDays.has(day.toISOString());
+                            return (
+                                <div
+                                    key={day.toISOString()}
+                                    className={`calendar-header-cell ${isToday(day) ? 'today' : ''} ${isLow ? 'low-attendance' : ''}`}
+                                >
+                                    <span className="day-name">{format(day, 'EEE')}</span>
+                                    <span className="day-number">{format(day, 'd')}</span>
+                                    {isLow && <span className="attendance-warn" title="Team attendance below 75%">⚠️</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Team Groups */}
+                    {teamGroups.map(({ team, members }) => {
+                        const isCollapsed = collapsedTeams.has(team);
+                        const memberCount = members.length;
                         return (
-                            <div
-                                key={day.toISOString()}
-                                className={`calendar-header-cell ${isToday(day) ? 'today' : ''} ${isLow ? 'low-attendance' : ''}`}
-                            >
-                                <span className="day-name">{format(day, 'EEE')}</span>
-                                <span className="day-number">{format(day, 'd')}</span>
-                                {isLow && <span className="attendance-warn" title="Team attendance below 75%">⚠️</span>}
+                            <div key={team}>
+                                {/* Team Header */}
+                                <div
+                                    className="team-group-header"
+                                    onClick={() => toggleTeam(team)}
+                                    style={{ gridTemplateColumns: gridCols }}
+                                >
+                                    <div className="team-group-name">
+                                        <span className={`team-chevron ${isCollapsed ? 'collapsed' : ''}`}>
+                                            ▾
+                                        </span>
+                                        <strong>{team}</strong>
+                                        <span className="team-member-count">
+                                            👥 {memberCount}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Members */}
+                                {!isCollapsed &&
+                                    members.map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="calendar-row"
+                                            style={{ gridTemplateColumns: gridCols }}
+                                        >
+                                            <div className="calendar-user-cell">
+                                                <div
+                                                    className="avatar"
+                                                    style={{ backgroundColor: user.avatarColor }}
+                                                >
+                                                    {user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="user-name">{user.name}</span>
+                                            </div>
+
+                                            {days.map((day) => {
+                                                const dayRequests = getRequestsForUserOnDay(user.id, day);
+                                                return (
+                                                    <div
+                                                        key={day.toISOString()}
+                                                        className={`calendar-day-cell ${isToday(day) ? 'today' : ''} ${lowAttendanceDays.has(day.toISOString()) ? 'low-attendance' : ''}`}
+                                                    >
+                                                        {dayRequests.map((req) => {
+                                                            const info = getReasonInfo(req.reason);
+                                                            const cls = getReasonClass(req.reason);
+                                                            const isHalfDay = info.type === 'HALF_DAY';
+                                                            const isFirstHalf = req.reason === 'FIRST_HALF_PTO';
+                                                            const statusClass = req.status === 'PENDING' ? 'pending' : 'approved';
+                                                            const halfClass = isHalfDay
+                                                                ? isFirstHalf
+                                                                    ? 'half-day-top'
+                                                                    : 'half-day-bottom'
+                                                                : 'full-day';
+
+                                                            return (
+                                                                <div
+                                                                    key={req.id}
+                                                                    className={`cal-entry ${cls} ${halfClass} ${statusClass} clickable`}
+                                                                    onClick={() => {
+                                                                        setSelectedRequest(req);
+                                                                        setApprovalNote('');
+                                                                    }}
+                                                                    title={req.notes}
+                                                                >
+                                                                    <span className="cal-entry-label">{info.label}</span>
+                                                                    {req.notes && (
+                                                                        <span className="cal-entry-note">{req.notes}</span>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ))}
                             </div>
                         );
                     })}
+
+                    {users.length === 0 && (
+                        <div className="empty-state">
+                            <div className="empty-icon">👥</div>
+                            <h3>No team members yet</h3>
+                            <p>Team members will appear here once they sign up.</p>
+                        </div>
+                    )}
                 </div>
 
-                {/* Team Groups */}
-                {teamGroups.map(({ team, members }) => {
-                    const isCollapsed = collapsedTeams.has(team);
-                    const memberCount = members.length;
-                    return (
-                        <div key={team}>
-                            {/* Team Header */}
-                            <div
-                                className="team-group-header"
-                                onClick={() => toggleTeam(team)}
-                                style={{ gridTemplateColumns: gridCols }}
-                            >
-                                <div className="team-group-name">
-                                    <span className={`team-chevron ${isCollapsed ? 'collapsed' : ''}`}>
-                                        ▾
-                                    </span>
-                                    <strong>{team}</strong>
-                                    <span className="team-member-count">
-                                        👥 {memberCount}
-                                    </span>
+                {/* Request Detail Modal */}
+                {selectedRequest && (
+                    <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
+                        <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+                            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span
+                                    style={{
+                                        width: '14px',
+                                        height: '14px',
+                                        borderRadius: '3px',
+                                        backgroundColor: getReasonInfo(selectedRequest.reason).color,
+                                        display: 'inline-block',
+                                    }}
+                                />
+                                {getReasonInfo(selectedRequest.reason).label}
+                            </h2>
+
+                            <div className="request-details" style={{ marginTop: '16px' }}>
+                                <div className="detail-item">
+                                    <div className="detail-label">Employee</div>
+                                    <div className="detail-value" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div
+                                            className="avatar"
+                                            style={{
+                                                backgroundColor: selectedRequest.user.avatarColor,
+                                                width: '24px',
+                                                height: '24px',
+                                                fontSize: '11px',
+                                            }}
+                                        >
+                                            {selectedRequest.user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        {selectedRequest.user.name}
+                                    </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="detail-label">Status</div>
+                                    <div className="detail-value">
+                                        <span className={`badge badge-${selectedRequest.status.toLowerCase()}`}>
+                                            {selectedRequest.status}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="detail-label">Start Date</div>
+                                    <div className="detail-value">
+                                        {format(new Date(selectedRequest.startDate), 'dd MMM yyyy')}
+                                    </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="detail-label">End Date</div>
+                                    <div className="detail-value">
+                                        {format(new Date(selectedRequest.endDate), 'dd MMM yyyy')}
+                                    </div>
+                                </div>
+                                <div className="detail-item">
+                                    <div className="detail-label">Type</div>
+                                    <div className="detail-value">
+                                        {getReasonInfo(selectedRequest.reason).type === 'HALF_DAY' ? 'Half Day' : 'Full Day'}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Members */}
-                            {!isCollapsed &&
-                                members.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        className="calendar-row"
-                                        style={{ gridTemplateColumns: gridCols }}
-                                    >
-                                        <div className="calendar-user-cell">
-                                            <div
-                                                className="avatar"
-                                                style={{ backgroundColor: user.avatarColor }}
-                                            >
-                                                {user.name.charAt(0).toUpperCase()}
-                                            </div>
-                                            <span className="user-name">{user.name}</span>
-                                        </div>
+                            <div className="request-notes" style={{ marginTop: '12px' }}>
+                                <strong>Notes:</strong> {selectedRequest.notes}
+                            </div>
 
-                                        {days.map((day) => {
-                                            const dayRequests = getRequestsForUserOnDay(user.id, day);
-                                            return (
-                                                <div
-                                                    key={day.toISOString()}
-                                                    className={`calendar-day-cell ${isToday(day) ? 'today' : ''} ${lowAttendanceDays.has(day.toISOString()) ? 'low-attendance' : ''}`}
-                                                >
-                                                    {dayRequests.map((req) => {
-                                                        const info = getReasonInfo(req.reason);
-                                                        const cls = getReasonClass(req.reason);
-                                                        const isHalfDay = info.type === 'HALF_DAY';
-                                                        const isFirstHalf = req.reason === 'FIRST_HALF_PTO';
-                                                        const statusClass = req.status === 'PENDING' ? 'pending' : 'approved';
-                                                        const halfClass = isHalfDay
-                                                            ? isFirstHalf
-                                                                ? 'half-day-top'
-                                                                : 'half-day-bottom'
-                                                            : 'full-day';
+                            {selectedRequest.approvalNote && (
+                                <div
+                                    className="request-notes"
+                                    style={{ borderLeft: '3px solid var(--accent)', marginTop: '8px' }}
+                                >
+                                    <strong>Approval note:</strong> {selectedRequest.approvalNote}
+                                    {selectedRequest.approver && (
+                                        <span style={{ color: 'var(--text-muted)' }}>
+                                            {' '}— {selectedRequest.approver.name}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
 
-                                                        return (
-                                                            <div
-                                                                key={req.id}
-                                                                className={`cal-entry ${cls} ${halfClass} ${statusClass} clickable`}
-                                                                onClick={() => {
-                                                                    setSelectedRequest(req);
-                                                                    setApprovalNote('');
-                                                                }}
-                                                                title={req.notes}
-                                                            >
-                                                                <span className="cal-entry-label">{info.label}</span>
-                                                                {req.notes && (
-                                                                    <span className="cal-entry-note">{req.notes}</span>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            );
-                                        })}
+                            {/* Approve/Reject actions for managers on pending requests */}
+                            {isManager && selectedRequest.status === 'PENDING' && (
+                                <div style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Manager Note (optional)</label>
+                                        <textarea
+                                            className="form-textarea"
+                                            value={approvalNote}
+                                            onChange={(e) => setApprovalNote(e.target.value)}
+                                            placeholder="Add a note..."
+                                            style={{ minHeight: '60px' }}
+                                        />
                                     </div>
-                                ))}
-                        </div>
-                    );
-                })}
+                                    <div className="modal-actions">
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={() => handleAction('REJECTED')}
+                                            disabled={actionLoading}
+                                        >
+                                            {actionLoading ? '...' : '❌ Reject'}
+                                        </button>
+                                        <button
+                                            className="btn btn-success"
+                                            onClick={() => handleAction('APPROVED')}
+                                            disabled={actionLoading}
+                                        >
+                                            {actionLoading ? '...' : '✅ Approve'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
-                {users.length === 0 && (
-                    <div className="empty-state">
-                        <div className="empty-icon">👥</div>
-                        <h3>No team members yet</h3>
-                        <p>Team members will appear here once they sign up.</p>
+                            {/* Close button for non-pending or non-managers */}
+                            {(!isManager || selectedRequest.status !== 'PENDING') && (
+                                <div className="modal-actions" style={{ marginTop: '16px' }}>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => setSelectedRequest(null)}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
-
-            {/* Request Detail Modal */}
-            {selectedRequest && (
-                <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
-                        <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span
-                                style={{
-                                    width: '14px',
-                                    height: '14px',
-                                    borderRadius: '3px',
-                                    backgroundColor: getReasonInfo(selectedRequest.reason).color,
-                                    display: 'inline-block',
-                                }}
-                            />
-                            {getReasonInfo(selectedRequest.reason).label}
-                        </h2>
-
-                        <div className="request-details" style={{ marginTop: '16px' }}>
-                            <div className="detail-item">
-                                <div className="detail-label">Employee</div>
-                                <div className="detail-value" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div
-                                        className="avatar"
-                                        style={{
-                                            backgroundColor: selectedRequest.user.avatarColor,
-                                            width: '24px',
-                                            height: '24px',
-                                            fontSize: '11px',
-                                        }}
-                                    >
-                                        {selectedRequest.user.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    {selectedRequest.user.name}
-                                </div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Status</div>
-                                <div className="detail-value">
-                                    <span className={`badge badge-${selectedRequest.status.toLowerCase()}`}>
-                                        {selectedRequest.status}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Start Date</div>
-                                <div className="detail-value">
-                                    {format(new Date(selectedRequest.startDate), 'dd MMM yyyy')}
-                                </div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">End Date</div>
-                                <div className="detail-value">
-                                    {format(new Date(selectedRequest.endDate), 'dd MMM yyyy')}
-                                </div>
-                            </div>
-                            <div className="detail-item">
-                                <div className="detail-label">Type</div>
-                                <div className="detail-value">
-                                    {getReasonInfo(selectedRequest.reason).type === 'HALF_DAY' ? 'Half Day' : 'Full Day'}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="request-notes" style={{ marginTop: '12px' }}>
-                            <strong>Notes:</strong> {selectedRequest.notes}
-                        </div>
-
-                        {selectedRequest.approvalNote && (
-                            <div
-                                className="request-notes"
-                                style={{ borderLeft: '3px solid var(--accent)', marginTop: '8px' }}
-                            >
-                                <strong>Approval note:</strong> {selectedRequest.approvalNote}
-                                {selectedRequest.approver && (
-                                    <span style={{ color: 'var(--text-muted)' }}>
-                                        {' '}— {selectedRequest.approver.name}
-                                    </span>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Approve/Reject actions for managers on pending requests */}
-                        {isManager && selectedRequest.status === 'PENDING' && (
-                            <div style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                                <div className="form-group">
-                                    <label className="form-label">Manager Note (optional)</label>
-                                    <textarea
-                                        className="form-textarea"
-                                        value={approvalNote}
-                                        onChange={(e) => setApprovalNote(e.target.value)}
-                                        placeholder="Add a note..."
-                                        style={{ minHeight: '60px' }}
-                                    />
-                                </div>
-                                <div className="modal-actions">
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={() => handleAction('REJECTED')}
-                                        disabled={actionLoading}
-                                    >
-                                        {actionLoading ? '...' : '❌ Reject'}
-                                    </button>
-                                    <button
-                                        className="btn btn-success"
-                                        onClick={() => handleAction('APPROVED')}
-                                        disabled={actionLoading}
-                                    >
-                                        {actionLoading ? '...' : '✅ Approve'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Close button for non-pending or non-managers */}
-                        {(!isManager || selectedRequest.status !== 'PENDING') && (
-                            <div className="modal-actions" style={{ marginTop: '16px' }}>
-                                <button
-                                    className="btn btn-secondary"
-                                    onClick={() => setSelectedRequest(null)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
