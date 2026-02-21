@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -12,6 +13,11 @@ export default function Sidebar() {
     if (!user) return null;
 
     const isManager = user.role === 'MANAGER';
+
+    useEffect(() => {
+        // Auto-close sidebar on mobile when navigating
+        document.body.classList.remove('sidebar-open');
+    }, [pathname]);
 
     const navItems = [
         { href: '/calendar', label: 'Calendar', icon: '📅' },
@@ -26,64 +32,72 @@ export default function Sidebar() {
     ];
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar-logo">
-                <h1>PTO Tracker</h1>
-                <span>Time Off Management</span>
-            </div>
+        <>
+            {/* Mobile Backdrop Overlay */}
+            <div
+                className="sidebar-overlay"
+                onClick={() => document.body.classList.remove('sidebar-open')}
+            />
 
-            <nav className="sidebar-nav">
-                <div className="sidebar-section-label">Main</div>
-                {navItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`nav-link ${pathname === item.href ? 'active' : ''}`}
+            <aside className="sidebar">
+                <div className="sidebar-logo">
+                    <h1>PTO Tracker</h1>
+                    <span>Time Off Management</span>
+                </div>
+
+                <nav className="sidebar-nav">
+                    <div className="sidebar-section-label">Main</div>
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`nav-link ${pathname === item.href ? 'active' : ''}`}
+                        >
+                            <span className="nav-icon">{item.icon}</span>
+                            {item.label}
+                        </Link>
+                    ))}
+
+                    {isManager && (
+                        <>
+                            <div className="sidebar-section-label">Manager</div>
+                            {managerItems.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`nav-link ${pathname === item.href ? 'active' : ''}`}
+                                >
+                                    <span className="nav-icon">{item.icon}</span>
+                                    {item.label}
+                                </Link>
+                            ))}
+                        </>
+                    )}
+
+                    <div style={{ flex: 1 }} />
+
+                    <button
+                        className="nav-link"
+                        onClick={() => signOut({ callbackUrl: '/login' })}
                     >
-                        <span className="nav-icon">{item.icon}</span>
-                        {item.label}
-                    </Link>
-                ))}
+                        <span className="nav-icon">🚪</span>
+                        Sign Out
+                    </button>
+                </nav>
 
-                {isManager && (
-                    <>
-                        <div className="sidebar-section-label">Manager</div>
-                        {managerItems.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`nav-link ${pathname === item.href ? 'active' : ''}`}
-                            >
-                                <span className="nav-icon">{item.icon}</span>
-                                {item.label}
-                            </Link>
-                        ))}
-                    </>
-                )}
-
-                <div style={{ flex: 1 }} />
-
-                <button
-                    className="nav-link"
-                    onClick={() => signOut({ callbackUrl: '/login' })}
-                >
-                    <span className="nav-icon">🚪</span>
-                    Sign Out
-                </button>
-            </nav>
-
-            <Link href="/profile" className="sidebar-user" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-                <div
-                    className="avatar"
-                    style={{ backgroundColor: user.avatarColor || '#6366f1' }}
-                >
-                    {user.name?.charAt(0).toUpperCase()}
-                </div>
-                <div className="user-info">
-                    <div className="user-name">{user.name}</div>
-                    <div className="user-role">{user.role}</div>
-                </div>
-            </Link>
-        </aside>
+                <Link href="/profile" className="sidebar-user" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                    <div
+                        className="avatar"
+                        style={{ backgroundColor: user.avatarColor || '#6366f1' }}
+                    >
+                        {user.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="user-info">
+                        <div className="user-name">{user.name}</div>
+                        <div className="user-role">{user.role}</div>
+                    </div>
+                </Link>
+            </aside>
+        </>
     );
 }

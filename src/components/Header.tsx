@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import NotificationBell from './NotificationBell';
 import { useTheme } from './ThemeProvider';
-import { ArrowDownTrayIcon, XMarkIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, XMarkIcon, MoonIcon, SunIcon, Bars3Icon } from '@heroicons/react/24/outline';
 
 interface HeaderProps {
     title: string;
@@ -33,7 +33,14 @@ export default function Header({ title, handleDownloadPDF }: HeaderProps) {
         <>
             <header className="header">
                 {/* Left: Title */}
-                <div className="header-title">
+                <div className="header-title" style={{ display: 'flex', alignItems: 'center' }}>
+                    <button
+                        className="mobile-menu-btn"
+                        onClick={() => document.body.classList.toggle('sidebar-open')}
+                        aria-label="Toggle Menu"
+                    >
+                        <Bars3Icon className="w-6 h-6" />
+                    </button>
                     {title}
                 </div>
 

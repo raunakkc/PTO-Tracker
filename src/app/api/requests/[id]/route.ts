@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendTeamsNotification } from '@/lib/teams';
 
 // PATCH: Approve/reject (manager) or Edit (owner)
 export async function PATCH(
@@ -150,6 +151,22 @@ export async function PATCH(
                 link: '/approvals',
             })),
         });
+
+        const teamsPayload = {
+            title: 'Time-Off Request Edited',
+            message: `**${user.name}** has edited their ${reason.replace(/_/g, ' ').toLowerCase()} request. It requires re-approval.`,
+            user: user.name,
+            startDate: start.toLocaleDateString(),
+            endDate: end.toLocaleDateString(),
+            reason: reason.replace(/_/g, ' ').toLowerCase(),
+            link: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/approvals?highlight=${updated.id}`,
+        };
+
+        try {
+            await sendTeamsNotification(teamsPayload);
+        } catch (err) {
+            console.error('Teams notification error on edit:', err);
+        }
 
         return NextResponse.json(updated);
     } catch (error) {
