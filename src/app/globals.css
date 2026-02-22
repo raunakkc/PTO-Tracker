@@ -1555,6 +1555,8 @@ body {
 
   .mobile-menu-btn svg,
   .header-actions .notification-btn svg {
+    width: 24px;
+    height: 24px;
     stroke: #f1f5f9 !important;
   }
 
